@@ -24,10 +24,35 @@
 
 - Object Detection API
     - Add FPN for Faster RCNN
+
+        - June 9: Download dataset and try to train a dataset
+
+        - June 10-13: try to implement FPN 
+
+            - 10: set up meta arch (feature extractor + fpn. <font color='red'>new meta arch?</font>) + preprocessing dataset 
+
+            - 11: Exam on June 11 PST. Possible canceling thursday meeting? 
+
+            - 12-14: 
+
+                - implement prediction / prediction test
+                - postprocess / loss
+                - test every step
+
+            - 15:
+
+                - setup training loop: overfit on small data
+                - test
+
+                
+
     - Move all our existing feature extractors to Keras
+
     - Add Precision/Recall as an eval metric (https://github.com/tensorflow/models/issues/8412)
 
 
+
+---
 
 
 
@@ -57,7 +82,160 @@
 
 <img src="figure/FPNStructure.png" alt="FPNStructure" style="zoom:50%;" />
 
+##### For Faster RCNN: assign RoI of different scales to the pyramid levels
+
+Assign an RoI of width $w$ and height $h$ (on the input image to the network) to the level $P_k$ of feature pyramid by:
+
+$$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$
+
+Here 224 is the canonical ImageNet pre-training size, and $k_0$ is the target level on which an RoI with $w×h = 224^2$ should be mapped into.
+
+
+
+---
+
 
 
 ### Object Detection API
+
+#### Meta Architectures
+
+- Detection Model Interface: core/model.py:
+    - tensor-in / tensor-out design
+    - computation graphs
+        - Training time:
+            inputs (images tensor) -> preprocess -> predict -> loss -> outputs (loss tensor)
+        - Evaluation time:
+            inputs (images tensor) -> preprocess -> predict -> postprocess
+             -> outputs (boxes tensor, scores tensor, classes tensor, num_detections tensor)
+    - Notes:
+        - standard_fields: naming convention
+        - DetectionModel: a class containing many abstact methods.
+            - get_side_inputs (static): 
+            - preprocess: 
+                - scaling, shifting, resizing, padding
+                - no trainable parameters
+                - batchsize != batchsize in predict (assuming 1)
+                - return processed image and original shape
+                -  <font color='red'>There is also no explicit assumption that the output resolutions must be fixed across inputs --- this is to support *"fully convolutional" settings* in which input images can have different shapes/resolutions. ??? fully convolutional neural network</font>
+            - predict:
+                - input processed image and original shape
+                - output prediction
+            - postprocess:
+                - get final detection
+                - NMS / convert score / remove backgroud class
+                - Output
+                    - Class: [0, num_classes)
+                    - Boxes: [y_min, x_min, y_max, x_max]
+                    - detections can pad into fixed number of boxes
+                    - <font color='red'>What is keypoints?</font>
+            - loss:
+                - need group truth
+            - provide_groundtruth:
+                - add groudtruth
+                    - boxes and classes ground truth
+            - regularization_losses:
+            - restore_map:
+                - restore from check point
+            - updates:
+                - <font color='red'>Which operators...?</font>
+            - call:
+                - connect all steps
+
+
+
+#### Code Pointers
+
+##### Data pipeline
+
+- inputs.py
+    - train_input:
+        - output features and labels
+        - data_augmentation
+        - image_resizer
+        - transform_input_data: use data_augmentation & image_resizer
+        - pad_input_data_to_static_shapes: use transform_input_data
+        - INPUT_BUILDER_UTIL_MAP['dataset_build']: use pad_input_data_to_static_shapes
+
+#####  Reader
+
+- core/data_decoder.py:
+    - DataDecoder (abstract):
+        - return dictionary associate image and labels.
+
+##### Data Augmenter
+
+- core/preprocessor.py:
+
+    - preprocess
+
+        - input tensor, list of tuple (function, dict of args), map function with args, cache (deterministic using same cache).
+
+        
+
+#### Target Assignment
+
+- target_assigner.py:
+    - compute similarity
+    - compute matching
+    - assign regression targets: use matching, BoxCoder
+    - assign classification targets: use matching
+    - one image a time
+- core/matcher.py
+- core/region_similarity_calculator.py
+- core/boxCoder
+
+
+
+#### Prediction
+
+##### Feature Extractor
+
+- meta_architectures/faster_rcnn_meta_arch.py:
+    - three modes: number of stages different {1, 2, 3}
+        - 1 stage: only RPN
+        - 2 stages: proposals -> box classifier
+        - 3 stages: eval: proposals -> box classifier -> NMS -> box classifier
+    - functions overide:
+        - preprocess
+        - _extract_proposal_features
+        - _extract_box_classifier_features
+
+##### Head
+
+- predictors/heads/head.py:
+    - head class
+    - overide predict
+    - add to meta structure
+    - compute loss
+    - (optional) visualization
+
+##### Box Predictor
+
+- core/box_predictor.py：
+    - passed directly to loss functions
+    - predict location, predict class
+
+##### Anchor Generator
+
+- core/anchor_generator.py
+    - create (or load) a collection of bounding boxes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
