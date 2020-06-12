@@ -1,6 +1,7 @@
 # GSoC 2020 - TenserFlow: Learning Notes
 
 - Learn Google Cloud Platform
+    - https://gcp-tutorial.readthedocs.io/en/latest/index.html
     - The restart command is different create command
     - Use version: tf nightly 
     - Don't delete VM
@@ -25,30 +26,71 @@
 - Object Detection API
     - Add FPN for Faster RCNN
 
-        - June 9: Download dataset and try to train a dataset
-
-        - June 10-13: try to implement FPN 
-
-            - 10: set up meta arch (feature extractor + fpn. <font color='red'>new meta arch?</font>) + preprocessing dataset 
-
-            - 11: Exam on June 11 PST. Possible canceling thursday meeting? 
-
-            - 12-14: 
-
-                - implement prediction / prediction test
-                - postprocess / loss
-                - test every step
-
+        - June 9: ~~Download dataset and try to train a dataset~~
+        -  <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15
+            - <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
+    - June 10-13: try to implement FPN 
+    
+        - 10: Find the entry point and setup implemetation plan
+        - 11: ~~Exam on June 11 PST. Possible canceling thursday meeting?~~
+        - 12-14: 
+        - implement prediction / prediction test
+            - postprocess / loss
+            - test every step
             - 15:
+            
+            - setup training loop: overfit on small data
+            - test
 
-                - setup training loop: overfit on small data
-                - test
+```python
+# possible code structure
+# in models/faster_rcnn_fpn_keras_feature_extractor.py
 
-                
+def assign_feature_levels():
+  # TODO: assignment strategy of region-based detectors
+  # if the RoI’s scale becomes smaller, it should be mapped into a finer-resolution level
+  # $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ 
+  # input feature 
+  pass
 
-    - Move all our existing feature extractors to Keras
+class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFeatureExtractor):
+  def __init__(self, ...):
+    # TODO: constructor
+    pass
+  
+  def build:
+    # TODO: Build the structure, should be very similar as ssd_*_fpn_keras_feature_extractor.py
+    # ResNet-101 (object_detection.models.keras_models)
+    # object_detection.models.feature_map_generators
+    pass
+  
+  def preprocess(self, ...):
+    # TODO: should be the same as others
+    pass
+  
+  def _extract_proposal_features(self, ...):
+    # TODO: Extracts first stage RPN features
+    # assign_feature_levels()
+    # spatial_transform_ops.multilevel_roi_align
+    pass
+  
+  def _extract_box_classifier_features(self, ...):
+    # TODO: Extracts second stage box classifier features.
+    pass
+  
+  def restore_from_classification_checkpoint_fn(self, ...):
+    pass
+    
 
-    - Add Precision/Recall as an eval metric (https://github.com/tensorflow/models/issues/8412)
+# predictor using convolutional keras box predictor
+```
+
+
+
+
+
+- Move all our existing feature extractors to Keras
+- Add Precision/Recall as an eval metric (https://github.com/tensorflow/models/issues/8412)
 
 
 
