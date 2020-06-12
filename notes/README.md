@@ -27,32 +27,36 @@
     - Add FPN for Faster RCNN
 
         - June 9: ~~Download dataset and try to train a dataset~~
-        -  <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15
+            -  <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15
             - <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
-    - June 10-13: try to implement FPN 
-    
-        - 10: Find the entry point and setup implemetation plan
+        - June 10-13: try to implement FPN 
+
+            - 10: ~~Find the entry point and setup implemetation plan~~
         - 11: ~~Exam on June 11 PST. Possible canceling thursday meeting?~~
-        - 12-14: 
-        - implement prediction / prediction test
-            - postprocess / loss
+            - 12-14: 
+        - implementation tips:
+                - Follow code structure (below)
+                - target assignment need to adjust to multi feature (faster rcnn meta arch)
+                    - fork / open a pull request / push small piece
             - test every step
             - 15:
-            
-            - setup training loop: overfit on small data
+
+                - setup training loop: overfit on small data
             - test
 
 ```python
 # possible code structure
 # in models/faster_rcnn_fpn_keras_feature_extractor.py
 
-def assign_feature_levels():
-  # TODO: assignment strategy of region-based detectors
-  # if the RoI’s scale becomes smaller, it should be mapped into a finer-resolution level
-  # $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ 
-  # input box size, k_0
-  # output k
-  pass
+# No need to implement this function
+# Fpn_feature_levels (https://github.com/tensorflow/models/blob/master/research/object_detection/utils/ops.py#L1009)
+# def assign_feature_levels():
+#   # TODO: assignment strategy of region-based detectors
+#   # if the RoI’s scale becomes smaller, it should be mapped into a finer-resolution level
+#   # $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ 
+#   # input box size, k_0
+#   # output k
+#   pass
 
 class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFeatureExtractor):
   def __init__(self, ...):
@@ -71,8 +75,10 @@ class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFe
   
   def _extract_proposal_features(self, ...):
     # TODO: Extracts first stage RPN features
-    # assign_feature_levels()
-    # spatial_transform_ops.multilevel_roi_align
+    # [x] assign_feature_levels() 
+    # 	⬆️ Fpn_feature_levels 
+    # [x] spatial_transform_ops.multilevel_roi_align
+    # 	⬆️ is in faster rcnn meta arch
     pass
   
   def _extract_box_classifier_features(self, ...):
@@ -80,13 +86,12 @@ class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFe
     pass
   
   def restore_from_classification_checkpoint_fn(self, ...):
+    # follow the none fpn version
     pass
     
 
 # predictor using convolutional keras box predictor
 ```
-
-
 
 
 
