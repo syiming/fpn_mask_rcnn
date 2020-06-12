@@ -50,7 +50,8 @@ def assign_feature_levels():
   # TODO: assignment strategy of region-based detectors
   # if the RoI’s scale becomes smaller, it should be mapped into a finer-resolution level
   # $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ 
-  # input feature 
+  # input box size, k_0
+  # output k
   pass
 
 class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFeatureExtractor):
