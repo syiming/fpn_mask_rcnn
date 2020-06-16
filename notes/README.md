@@ -23,26 +23,80 @@
 
 ### Task
 
-- Object Detection API
-    - Add FPN for Faster RCNN
+* Object Detection API
+    * Add FPN for Faster RCNN
 
-        - June 9: ~~Download dataset and try to train a dataset~~
-            -  <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15
-            - <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
-        - June 10-13: try to implement FPN 
+        - ~~June 9: Download dataset and try to train a dataset~~
+            
+            -  ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
+            - ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
+        - June 10-15: try to implement FPN 
 
-            - 10: ~~Find the entry point and setup implemetation plan~~
-        - 11: ~~Exam on June 11 PST. Possible canceling thursday meeting?~~
-            - 12-14: 
-        - implementation tips:
-                - Follow code structure (below)
-                - target assignment need to adjust to multi feature (faster rcnn meta arch)
+            - ~~June 10: Find the entry point and setup implemetation plan~~
+
+            - ~~June 11: Exam on June 11 PST. Possible canceling thursday meeting?~~
+
+            - June 12-14: 
+
+                - implementation tips:
+
+                    - Follow code structure (below)
+
+                    - target assignment need to adjust to multi feature (faster rcnn meta arch)
+
                     - fork / open a pull request / push small piece
-            - test every step
+
+                    - ~~✅ <span style="color:red">Lisence？Should I just copy the lisency from another file? Is there anything else I need to do? Copy</span>~~
+
+                    - ~~✅ <span style="color:red">currently using resnet 50 in object_detection.models.keras_models: future wrtiting abstractions to extend to resnet101 and 152
+                        </span>~~
+
+                        -  ~~<span style="color:red">maybe make build abstractmethod and have another 3 class: FasterRCNNResnetV150(101/152)FPNKerasFeatureExtractor </span>~~
+
+                    - ❓ <span style="color:red">Which parameters we want to passed into the constructor</span>
+
+                        - eg. default_batchnorm_momentum,
+
+                            ​       default_batchnorm_epsilon,
+
+                            ​       weight_decay,
+
+                            These will be handled in conv_hyperparameters.
+
+                            <span style="color:red">Why min_depth and depth_multiplier not handled in conv_hyperparameters?</span>
+
+                            depends on tenserflow 1 and 2. New example will be put on.
+
+                    - ❓<span style="color:red">confused about weights and include_top. I didn't find how the mobilenet_v1.mobilenet_v1 use these args (From Keras?). How it connected to keras?</span>
+
+                        - <span style="color:red">weights: random initialization.</span>
+                        - <span style="color:red">include_top: wether to include the top fc layer.</span>
+                        - 
+
+                    - ~~✅ <span style="color:red">self._depth_fn</span>~~
+
+                        ```python
+                        full_mobilenet_v1 = mobilenet_v1.mobilenet_v1(
+                                batchnorm_training=(self._is_training and not self._freeze_batchnorm),
+                                conv_hyperparams=(self._conv_hyperparams
+                                                  if self._override_base_feature_extractor_hyperparams
+                                                  else None),
+                                weights=None,
+                                use_explicit_padding=self._use_explicit_padding,
+                                alpha=self._depth_multiplier,
+                                min_depth=self._min_depth,
+                                conv_defs=self._conv_defs,
+                                include_top=False)
+                        ```
+
+                    - unit test and check using small images 2\*40\*40\*3
+
+                - test every step
+
             - 15:
 
                 - setup training loop: overfit on small data
-            - test
+                - test
 
 ```python
 # possible code structure
@@ -63,7 +117,7 @@ class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFe
     # TODO: constructor
     pass
   
-  def build:
+  def build(self, ...):
     # TODO: Build the structure, should be very similar as ssd_*_fpn_keras_feature_extractor.py
     # ResNet-101 (object_detection.models.keras_models)
     # object_detection.models.feature_map_generators
