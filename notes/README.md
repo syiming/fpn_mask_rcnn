@@ -65,15 +65,23 @@
 
                             <span style="color:red">Why min_depth and depth_multiplier not handled in conv_hyperparameters?</span>
 
-                            depends on tenserflow 1 and 2. New example will be put on.
+                            ⬆️ depends on tenserflow 1 and 2. New example will be put on. (email)
 
                     - ❓<span style="color:red">confused about weights and include_top. I didn't find how the mobilenet_v1.mobilenet_v1 use these args (From Keras?). How it connected to keras?</span>
 
                         - <span style="color:red">weights: random initialization.</span>
+
                         - <span style="color:red">include_top: wether to include the top fc layer.</span>
-                        - 
+
+                            ⬆️
 
                     - ~~✅ <span style="color:red">self._depth_fn</span>~~
+
+                    - ❓<span style="color:red">def get_proposal_feature_extractor_model(self, name=None): from faster rcnn resnet keras feature extractor, only reture keras_model</span>
+
+                    - ❓ <span style="color:red">what does variable_dict do? (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:129-130)</span>
+
+                    - ❓<span style="color:red">model_util.extract_submodel (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:170)</span>
 
                         ```python
                         full_mobilenet_v1 = mobilenet_v1.mobilenet_v1(
