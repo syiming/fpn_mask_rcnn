@@ -14,6 +14,7 @@
 - **GitHub / Stack Overflow support for Object Detection API**
 - Documentation and Colab examples for computer vision (Details to be provided later)
 - Blog post
+- in July help testing some models
 
 
 
@@ -77,11 +78,11 @@
 
                     - ~~✅ <span style="color:red">self._depth_fn</span>~~
 
-                    - ❓<span style="color:red">def get_proposal_feature_extractor_model(self, name=None): from faster rcnn resnet keras feature extractor, only reture keras_model</span>
+                    - ~~✅<span style="color:red">def get_proposal_feature_extractor_model(self, name=None): from faster rcnn resnet keras feature extractor, only reture keras_model</span>~~
 
                     - ❓ <span style="color:red">what does variable_dict do? (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:129-130)</span>
 
-                    - ❓<span style="color:red">model_util.extract_submodel (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:170)</span>
+                    - ~~✅ <span style="color:red">model_util.extract_submodel (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:170)</span>~~
 
                         ```python
                         full_mobilenet_v1 = mobilenet_v1.mobilenet_v1(
@@ -98,6 +99,8 @@
                         ```
 
                     - unit test and check using small images 2\*40\*40\*3
+
+                        - **update**: the size of images has to be able to devide 32
 
                 - test every step
 
@@ -135,12 +138,27 @@ class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFe
     # TODO: should be the same as others
     pass
   
-  def _extract_proposal_features(self, ...):
+  def get_proposal_feature_extractor_model(self, name=None):
+    """variable values"""
+    output_layers: ['conv2_block3_out', 'conv3_block4_out', 'conv4_block6_out', 'conv5_block3_out']
+      
+		# outputs: [<tf.Tensor 'conv2_block3_out/Identity:0' shape=(None, None, None, 256) dtype=float32>, <tf.Tensor 'conv3_block4_out/Identity:0' shape=(None, None, None, 512) dtype=float32>, <tf.Tensor 'conv4_block6_out/Identity:0' shape=(None, None, None, 1024) dtype=float32>, <tf.Tensor 'conv5_block3_out/Identity:0' shape=(None, None, None, 2048) dtype=float32>]
+      
+		# backbone_outputs: [<tf.Tensor 'model/Identity:0' shape=(None, None, None, 256) dtype=float32>, <tf.Tensor 'model/Identity_1:0' shape=(None, None, None, 512) dtype=float32>, <tf.Tensor 'model/Identity_2:0' shape=(None, None, None, 1024) dtype=float32>, <tf.Tensor 'model/Identity_3:0' shape=(None, None, None, 2048) dtype=float32>]
+      
+      
+		# feature_block_map: {'block1': <tf.Tensor 'model/Identity:0' shape=(None, None, None, 256) dtype=float32>, 'block2': <tf.Tensor 'model/Identity_1:0' shape=(None, None, None, 512) dtype=float32>, 'block3': <tf.Tensor 'model/Identity_2:0' shape=(None, None, None, 1024) dtype=float32>, 'block4': <tf.Tensor 'model/Identity_3:0' shape=(None, None, None, 2048) dtype=float32>}
+
+    # fpn_input_image_features: [('block2', <tf.Tensor 'model/Identity_1:0' shape=(None, None, None, 512) dtype=float32>), ('block3', <tf.Tensor 'model/Identity_2:0' shape=(None, None, None, 1024) dtype=float32>), ('block4', <tf.Tensor 'model/Identity_3:0' shape=(None, None, None, 2048) dtype=float32>)]
+        
+		# fpn_features: OrderedDict([('top_down_block2', <tf.Tensor 'smoothing_1/Identity:0' shape=(None, None, None, 256) dtype=float32>), ('top_down_block3', <tf.Tensor 'smoothing_2/Identity:0' shape=(None, None, None, 256) dtype=float32>), ('top_down_block4', <tf.Tensor 'projection_3/Identity:0' shape=(None, None, None, 256) dtype=float32>)])
+    
     # TODO: Extracts first stage RPN features
     # [x] assign_feature_levels() 
     # 	⬆️ Fpn_feature_levels 
     # [x] spatial_transform_ops.multilevel_roi_align
     # 	⬆️ is in faster rcnn meta arch
+    #      @_compute_second_stage_input_feature_maps
     pass
   
   def _extract_box_classifier_features(self, ...):
