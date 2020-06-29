@@ -32,8 +32,9 @@
 
 ###### ✅ June 9: Download dataset and try to train a dataset
 
--  ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
-- ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
+- **Questions**:
+    - ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
+    - ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
 
 ---
 
@@ -156,12 +157,11 @@
                 include_top=False)
         ```
 
-        - unit test and check using small images 2\*40\*40\*3
-            - **update**: the size of images has to be able to devide 32
+    - unit test and check using small images 2\*40\*40\*3
+
+        - **update**: the size of images has to be able to devide 32
 
     - test every step
-
-    </br>
 
     **Pull request: [Add Faster RCNN Resnet V1 FPN Keras feature extractor](https://github.com/tensorflow/models/pull/8716)**
 
@@ -171,11 +171,7 @@
 
 - Questions:
 
-    - ? image_ratio: A float indicating the ratio of input image area to pretraining
-
-    ​      image area. fpn_feature_levels(num_levels, unit_scale_index, image_ratio, boxes):
-
-    </br>
+    - ? image_ratio: A float indicating the ratio of input image area to pretraining image area. fpn_feature_levels(num_levels, unit_scale_index, image_ratio, boxes):
 
     **Pull request: [Add multilevel crop and resize functions](https://github.com/tensorflow/models/pull/8746)**
 
