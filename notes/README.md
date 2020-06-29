@@ -24,156 +24,204 @@
 
 ### Task
 
-* Object Detection API
-    * Add FPN for Faster RCNN
+####Object Detection API
 
-        - ~~June 9: Download dataset and try to train a dataset~~
+#####Add FPN for Faster RCNN
+
+######✅ June 9: Download dataset and try to train a dataset
+
+-  ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
+- ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
+
+######✅ June 10-19: try to implement FPN Feature Extractor
+
+- ~~June 10: Find the entry point and setup implemetation plan~~
+
+- ~~June 11: Exam on June 11 PST. Possible canceling thursday meeting?~~
+
+- June 12-19: 
+
+    - Discuss code structure. Follow code structure (below)
+
+        - ```python
+            # possible code structure
+            # in models/faster_rcnn_fpn_keras_feature_extractor.py
             
-            -  ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
-            - ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
-        - June 10-15: try to implement FPN 
+            # No need to implement this function
+            # Fpn_feature_levels (https://github.com/tensorflow/models/blob/master/research/object_detection/utils/ops.py#L1009)
+            # def assign_feature_levels():
+            #   # TODO: assignment strategy of region-based detectors
+            #   # if the RoI’s scale becomes smaller, it should be mapped into a finer-resolution level
+            #   # $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ 
+            #   # input box size, k_0
+            #   # output k
+            #   pass
+            
+            class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFeatureExtractor):
+              def __init__(self, ...):
+                # TODO: constructor
+                pass
+              
+              def build(self, ...):
+                # TODO: Build the structure, should be very similar as ssd_*_fpn_keras_feature_extractor.py
+                # ResNet-101 (object_detection.models.keras_models)
+                # object_detection.models.feature_map_generators
+                pass
+              
+              def preprocess(self, ...):
+                # TODO: should be the same as others
+                pass
+              
+              def get_proposal_feature_extractor_model(self, name=None):
+                """variable values"""
+                # TODO: Extracts first stage RPN features
+                # [x] assign_feature_levels() 
+                # 	⬆️ Fpn_feature_levels 
+                # [x] spatial_transform_ops.multilevel_roi_align
+                # 	⬆️ is in faster rcnn meta arch
+                #      @_compute_second_stage_input_feature_maps
+                pass
+              
+              def _extract_box_classifier_features(self, ...):
+                # TODO: Extracts second stage box classifier features.
+                pass
+              
+              def restore_from_classification_checkpoint_fn(self, ...):
+                # follow the none fpn version
+                pass
+                
+            
+            # predictor using convolutional keras box predictor
+            ```
 
-            - ~~June 10: Find the entry point and setup implemetation plan~~
+    - **Tips**:
 
-            - ~~June 11: Exam on June 11 PST. Possible canceling thursday meeting?~~
+        - target assignment need to adjust to multi feature (faster rcnn meta arch)
+        - fork / open a pull request / push small piece
 
-            - June 12-14: 
+    - **Questions**:
 
-                - implementation tips:
+        - ~~✅ <span style="color:red">Lisence？Should I just copy the lisency from another file? Is there anything else I need to do? Copy</span>~~
 
-                    - Follow code structure (below)
+        - ~~✅ <span style="color:red">currently using resnet 50 in object_detection.models.keras_models: future wrtiting abstractions to extend to resnet101 and 152
+            </span>~~
 
-                    - target assignment need to adjust to multi feature (faster rcnn meta arch)
+            -  ~~<span style="color:red">maybe make build abstractmethod and have another 3 class: FasterRCNNResnetV150(101/152)FPNKerasFeatureExtractor </span>~~
 
-                    - fork / open a pull request / push small piece
+        - ❓ <span style="color:red">Which parameters we want to passed into the constructor</span>
 
-                    - ~~✅ <span style="color:red">Lisence？Should I just copy the lisency from another file? Is there anything else I need to do? Copy</span>~~
+            - eg. default_batchnorm_momentum,
 
-                    - ~~✅ <span style="color:red">currently using resnet 50 in object_detection.models.keras_models: future wrtiting abstractions to extend to resnet101 and 152
-                        </span>~~
+            ​              default_batchnorm_epsilon,
 
-                        -  ~~<span style="color:red">maybe make build abstractmethod and have another 3 class: FasterRCNNResnetV150(101/152)FPNKerasFeatureExtractor </span>~~
+            ​              weight_decay,
 
-                    - ❓ <span style="color:red">Which parameters we want to passed into the constructor</span>
+            ​       These will be handled in conv_hyperparameters.
 
-                        - eg. default_batchnorm_momentum,
+            <span style="color:red">       Why min_depth and depth_multiplier not handled in conv_hyperparameters?</span>
 
-                            ​       default_batchnorm_epsilon,
+            ​       ⬆️ depends on tenserflow 1 and 2. New example will be put on. (email)
 
-                            ​       weight_decay,
+        - ❓<span style="color:red">confused about weights and include_top. I didn't find how the mobilenet_v1.mobilenet_v1 use these args (From Keras?). How it connected to keras?</span>
 
-                            These will be handled in conv_hyperparameters.
+            - <span style="color:red">weights: random initialization.</span>
 
-                            <span style="color:red">Why min_depth and depth_multiplier not handled in conv_hyperparameters?</span>
+            - <span style="color:red">include_top: wether to include the top fc layer.</span>
 
-                            ⬆️ depends on tenserflow 1 and 2. New example will be put on. (email)
+                ⬆️
 
-                    - ❓<span style="color:red">confused about weights and include_top. I didn't find how the mobilenet_v1.mobilenet_v1 use these args (From Keras?). How it connected to keras?</span>
+        - ~~✅ <span style="color:red">self._depth_fn</span>~~
 
-                        - <span style="color:red">weights: random initialization.</span>
+        - ~~✅<span style="color:red">def get_proposal_feature_extractor_model(self, name=None): from faster rcnn resnet keras feature extractor, only reture keras_model</span>~~
 
-                        - <span style="color:red">include_top: wether to include the top fc layer.</span>
+        - ❓ <span style="color:red">what does variable_dict do? (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:129-130)</span>
 
-                            ⬆️
+        - ~~✅ <span style="color:red">model_util.extract_submodel (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:170)</span>~~
 
-                    - ~~✅ <span style="color:red">self._depth_fn</span>~~
+        ```python
+        full_mobilenet_v1 = mobilenet_v1.mobilenet_v1(
+                batchnorm_training=(self._is_training and not self._freeze_batchnorm),
+                conv_hyperparams=(self._conv_hyperparams
+                                  if self._override_base_feature_extractor_hyperparams
+                                  else None),
+                weights=None,
+                use_explicit_padding=self._use_explicit_padding,
+                alpha=self._depth_multiplier,
+                min_depth=self._min_depth,
+                conv_defs=self._conv_defs,
+                include_top=False)
+        ```
 
-                    - ~~✅<span style="color:red">def get_proposal_feature_extractor_model(self, name=None): from faster rcnn resnet keras feature extractor, only reture keras_model</span>~~
+        - unit test and check using small images 2\*40\*40\*3
+            - **update**: the size of images has to be able to devide 32
 
-                    - ❓ <span style="color:red">what does variable_dict do? (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:129-130)</span>
+    - test every step
 
-                    - ~~✅ <span style="color:red">model_util.extract_submodel (models/research/object_detection/models/faster_rcnn_resnet_keras_feature_extractor.py:170)</span>~~
-
-                        ```python
-                        full_mobilenet_v1 = mobilenet_v1.mobilenet_v1(
-                                batchnorm_training=(self._is_training and not self._freeze_batchnorm),
-                                conv_hyperparams=(self._conv_hyperparams
-                                                  if self._override_base_feature_extractor_hyperparams
-                                                  else None),
-                                weights=None,
-                                use_explicit_padding=self._use_explicit_padding,
-                                alpha=self._depth_multiplier,
-                                min_depth=self._min_depth,
-                                conv_defs=self._conv_defs,
-                                include_top=False)
-                        ```
-
-                    - unit test and check using small images 2\*40\*40\*3
-
-                        - **update**: the size of images has to be able to devide 32
-
-                - test every step
-
-            - 15:
-
-                - setup training loop: overfit on small data
-                - test
-
-```python
-# possible code structure
-# in models/faster_rcnn_fpn_keras_feature_extractor.py
-
-# No need to implement this function
-# Fpn_feature_levels (https://github.com/tensorflow/models/blob/master/research/object_detection/utils/ops.py#L1009)
-# def assign_feature_levels():
-#   # TODO: assignment strategy of region-based detectors
-#   # if the RoI’s scale becomes smaller, it should be mapped into a finer-resolution level
-#   # $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ 
-#   # input box size, k_0
-#   # output k
-#   pass
-
-class FasterRCNNFPNKerasFeatureExtractor(faster_rcnn_meta_arch.FasterRCNNKerasFeatureExtractor):
-  def __init__(self, ...):
-    # TODO: constructor
-    pass
-  
-  def build(self, ...):
-    # TODO: Build the structure, should be very similar as ssd_*_fpn_keras_feature_extractor.py
-    # ResNet-101 (object_detection.models.keras_models)
-    # object_detection.models.feature_map_generators
-    pass
-  
-  def preprocess(self, ...):
-    # TODO: should be the same as others
-    pass
-  
-  def get_proposal_feature_extractor_model(self, name=None):
-    """variable values"""
-    output_layers: ['conv2_block3_out', 'conv3_block4_out', 'conv4_block6_out', 'conv5_block3_out']
-      
-		# outputs: [<tf.Tensor 'conv2_block3_out/Identity:0' shape=(None, None, None, 256) dtype=float32>, <tf.Tensor 'conv3_block4_out/Identity:0' shape=(None, None, None, 512) dtype=float32>, <tf.Tensor 'conv4_block6_out/Identity:0' shape=(None, None, None, 1024) dtype=float32>, <tf.Tensor 'conv5_block3_out/Identity:0' shape=(None, None, None, 2048) dtype=float32>]
-      
-		# backbone_outputs: [<tf.Tensor 'model/Identity:0' shape=(None, None, None, 256) dtype=float32>, <tf.Tensor 'model/Identity_1:0' shape=(None, None, None, 512) dtype=float32>, <tf.Tensor 'model/Identity_2:0' shape=(None, None, None, 1024) dtype=float32>, <tf.Tensor 'model/Identity_3:0' shape=(None, None, None, 2048) dtype=float32>]
-      
-      
-		# feature_block_map: {'block1': <tf.Tensor 'model/Identity:0' shape=(None, None, None, 256) dtype=float32>, 'block2': <tf.Tensor 'model/Identity_1:0' shape=(None, None, None, 512) dtype=float32>, 'block3': <tf.Tensor 'model/Identity_2:0' shape=(None, None, None, 1024) dtype=float32>, 'block4': <tf.Tensor 'model/Identity_3:0' shape=(None, None, None, 2048) dtype=float32>}
-
-    # fpn_input_image_features: [('block2', <tf.Tensor 'model/Identity_1:0' shape=(None, None, None, 512) dtype=float32>), ('block3', <tf.Tensor 'model/Identity_2:0' shape=(None, None, None, 1024) dtype=float32>), ('block4', <tf.Tensor 'model/Identity_3:0' shape=(None, None, None, 2048) dtype=float32>)]
-        
-		# fpn_features: OrderedDict([('top_down_block2', <tf.Tensor 'smoothing_1/Identity:0' shape=(None, None, None, 256) dtype=float32>), ('top_down_block3', <tf.Tensor 'smoothing_2/Identity:0' shape=(None, None, None, 256) dtype=float32>), ('top_down_block4', <tf.Tensor 'projection_3/Identity:0' shape=(None, None, None, 256) dtype=float32>)])
-    
-    # TODO: Extracts first stage RPN features
-    # [x] assign_feature_levels() 
-    # 	⬆️ Fpn_feature_levels 
-    # [x] spatial_transform_ops.multilevel_roi_align
-    # 	⬆️ is in faster rcnn meta arch
-    #      @_compute_second_stage_input_feature_maps
-    pass
-  
-  def _extract_box_classifier_features(self, ...):
-    # TODO: Extracts second stage box classifier features.
-    pass
-  
-  def restore_from_classification_checkpoint_fn(self, ...):
-    # follow the none fpn version
-    pass
     
 
-# predictor using convolutional keras box predictor
-```
+    **Pull request: [Add Faster RCNN Resnet V1 FPN Keras feature extractor](https://github.com/tensorflow/models/pull/8716)**
 
 
+
+######✅ June 22 - 24: Add multilevel crop and resize fn
+
+- Questions:
+
+    - ? image_ratio: A float indicating the ratio of input image area to pretraining
+
+    ​      image area. fpn_feature_levels(num_levels, unit_scale_index, image_ratio, boxes):
+
+    
+
+    **Pull request: [Add multilevel crop and resize functions](https://github.com/tensorflow/models/pull/8746)**
+
+
+
+######June 24 - 25, 29: modify meta arch:
+
+- functions modified due to multilevel crop and resize functions:
+
+    - ``````python
+        def _compute_second_stage_input_feature_maps(self, features_to_crop,
+                                                       proposal_boxes_normalized,
+                                                       **side_inputs)
+          # change rpn_features_to_crop into a list
+          # change rpn_box_predictor_features into a list (corresponding to rpn_features_to_crop)
+        ``````
+
+- Compare two possible solutions for supporting multilevel features: 5D tensor vs. list of 4D tensor
+
+    self._extract_proposal_features for fpn will return a list of 4D tensors.
+
+    | function                                        | things need to be change (Notation: *returned*, **function**) |
+    | ----------------------------------------------- | ------------------------------------------------------------ |
+    | _extract_rpn_feature_maps                       | *rpn_features_to_crop*<br />*rpn_box_predictor_features*<br />*anchors* |
+    | _predict_first_stage                            | from _extract_rpn_feature_maps：<br />- rpn_box_predictor_features<br />- rpn_features_to_crop<br />- anchors_boxlist<br />**\_predict_rpn_proposals(rpn_box_predictor_features)**<br />**box_list_ops.clip_to_window(anchors_boxlist)<br />\_remove_invalid_anchors_and_predictions(rpn_box_encodings, rpn_objectness_predictions_with_background)** |
+    | _predict_rpn_proposals                          | Input: rpn_box_predictor_features<br />- **self.\_first_stage_box_predictor(rpn_box_predictor_features)**<br />- **self.\_first_stage_box_predictor.predict(rpn_box_predictor_features)**<br />Return: box_predictions (contain 2 lists)<br />*box_encodings*<br />*objectness_predictions_with_background* |
+    | \_first_stage_box_predictor<br /> (keras model) | box_predictor_builder.build_convolutional_box_predictor(<list>)<br />??? since the output list is corresponding to each input features. is the k_0 needs to be varied for different input feature???<br />Possible place of combine all |
+    | \_first_stage_box_predictor.predict             | box_predictor.predict(<list>)                                |
+    | predict                                         | **self._predict_second_stage()**<br />**self._predict_third_stage()**<br />*prediction_dict* |
+    | postprocess                                     | use prediction dict<br />**\_add_detection_features_output_node()**<br />**\_postprocess_rpn()** |
+    | \_postprocess_rpn                               | **\_batch_decode_boxes**                                     |
+    | loss                                            | use prediction dict                                          |
+    | \_loss_rpn                                      |                                                              |
+    | _predict_second_stage                           | use \_box_prediction (returns prediction dict)               |
+    | \_predict_third_stage                           | in none training mode use prediction_dict['rpn_features_to_crop'] |
+    | \_box_prediction                                | use \_compute_second_stage_input_feature_maps at the beginning |
+    | \_add_detection_features_output_node            | use \_compute_second_stage_input_feature_maps at the beginning |
+    |                                                 |                                                              |
+
+    it should end at the _compute_second_stage_input_feature_maps
+
+    |      | 5D Tensor                                                    | List of 4D Tensors                                           |
+    | ---- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+    | pro  | If we find find a good place to combine results for all levels. Then all the functions of the following steps doesn't need to be modified. (same for 5D tensor) | in lots of box methods: rpn_features_to_crop is already a list of 4D tensors <br />sometimes don't need to modify a function, just need to wrap it inside of a for loop<br />If we find find a good place to combine results for all levels. Then all the functions of the following steps doesn't need to be modified. (same for 5D tensor) |
+    | con  | Might need to go through the functions and models to see if actually gives us the correct result.<br />Need to take care of crop and resize | Going through loops is not efficient as 5D tensors           |
+
+
+
+- setup training loop: overfit on small data
+- test
 
 - Move all our existing feature extractors to Keras
 - Add Precision/Recall as an eval metric (https://github.com/tensorflow/models/issues/8412)
