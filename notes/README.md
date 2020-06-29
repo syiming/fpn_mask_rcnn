@@ -16,9 +16,9 @@
 - Blog post
 - in July help testing some models
 
+</br>
 
-
-
+</br>
 
 ## June
 
@@ -28,12 +28,16 @@
 
 ##### Add FPN for Faster RCNN
 
+---
+
 ###### ✅ June 9: Download dataset and try to train a dataset
 
 -  ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
 - ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
 
-######✅ June 10-19: try to implement FPN Feature Extractor
+---
+
+###### ✅ June 10-19: try to implement FPN Feature Extractor
 
 - ~~June 10: Find the entry point and setup implemetation plan~~
 
@@ -157,11 +161,11 @@
 
     - test every step
 
-    
+    </br>
 
     **Pull request: [Add Faster RCNN Resnet V1 FPN Keras feature extractor](https://github.com/tensorflow/models/pull/8716)**
 
-
+---
 
 ###### ✅ June 22 - 24: Add multilevel crop and resize fn
 
@@ -171,11 +175,11 @@
 
     ​      image area. fpn_feature_levels(num_levels, unit_scale_index, image_ratio, boxes):
 
-    
+    </br>
 
     **Pull request: [Add multilevel crop and resize functions](https://github.com/tensorflow/models/pull/8746)**
 
-
+---
 
 ###### June 24 - 25, 29: modify meta arch:
 
@@ -218,7 +222,7 @@
     | pro  | If we find find a good place to combine results for all levels. Then all the functions of the following steps doesn't need to be modified. (same for 5D tensor) | in lots of box methods: rpn_features_to_crop is already a list of 4D tensors <br />sometimes don't need to modify a function, just need to wrap it inside of a for loop<br />If we find find a good place to combine results for all levels. Then all the functions of the following steps doesn't need to be modified. (same for 5D tensor) |
     | con  | Might need to go through the functions and models to see if actually gives us the correct result.<br />Need to take care of crop and resize | Going through loops is not efficient as 5D tensors           |
 
-
+</br>
 
 - setup training loop: overfit on small data
 - test
@@ -226,17 +230,15 @@
 - Move all our existing feature extractors to Keras
 - Add Precision/Recall as an eval metric (https://github.com/tensorflow/models/issues/8412)
 
+</br>
 
-
-
+</br>
 
 ---
 
+###  FPN: Feature Pyramid Networks for Object Detection
 
-
-### FPN: Feature Pyramid Networks for Object Detection
-
-##### Why use FPN?
+#####  Why use FPN?
 
 - The Faster RCNN I learned before only uses the feature comming out from the backbone network. This featurn map contains high semantic information but not much position information. This makes the network having difficulties detecting small objects.
 
@@ -246,7 +248,7 @@
 
 
 
-##### FPN idea
+#####  FPN idea
 
 <img src="figure/FeaturePyramid.png" alt="FeaturePyramid" style="zoom:30%;" />
 
@@ -256,7 +258,7 @@
 
 
 
-##### FPN Structure
+#####  FPN Structure
 
 <img src="figure/FPNStructure.png" alt="FPNStructure" style="zoom:50%;" />
 
@@ -272,11 +274,9 @@ Here 224 is the canonical ImageNet pre-training size, and $k_0$ is the target le
 
 ---
 
+###  Object Detection API
 
-
-### Object Detection API
-
-#### Meta Architectures
+####  Meta Architectures
 
 - Detection Model Interface: core/model.py:
     - tensor-in / tensor-out design
