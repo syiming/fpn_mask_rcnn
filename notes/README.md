@@ -24,11 +24,11 @@
 
 ### Task
 
-####Object Detection API
+#### Object Detection API
 
-#####Add FPN for Faster RCNN
+##### Add FPN for Faster RCNN
 
-######✅ June 9: Download dataset and try to train a dataset
+###### ✅ June 9: Download dataset and try to train a dataset
 
 -  ~~✅ <span style="color:red">When using runtime-version 1.12 encounter problem: tf.compat has no module v1</span>: Fixed using runtime version 1.15~~
 - ❓ <span style="color:red">Cannot allocate memory at iteration 3 or 4</span>
@@ -163,7 +163,7 @@
 
 
 
-######✅ June 22 - 24: Add multilevel crop and resize fn
+###### ✅ June 22 - 24: Add multilevel crop and resize fn
 
 - Questions:
 
@@ -177,7 +177,7 @@
 
 
 
-######June 24 - 25, 29: modify meta arch:
+###### June 24 - 25, 29: modify meta arch:
 
 - functions modified due to multilevel crop and resize functions:
 
@@ -225,6 +225,8 @@
 
 - Move all our existing feature extractors to Keras
 - Add Precision/Recall as an eval metric (https://github.com/tensorflow/models/issues/8412)
+
+
 
 
 
