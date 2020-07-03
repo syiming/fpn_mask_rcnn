@@ -173,6 +173,8 @@
 
     - ? image_ratio: A float indicating the ratio of input image area to pretraining image area. fpn_feature_levels(num_levels, unit_scale_index, image_ratio, boxes):
 
+- remember to run all test within the object detection
+
     **Pull request: [Add multilevel crop and resize functions](https://github.com/tensorflow/models/pull/8746)**
 
 ---
@@ -193,23 +195,23 @@
 
     self._extract_proposal_features for fpn will return a list of 4D tensors.
 
-    | function                                        | things need to be change (Notation: *returned*, **function**) |
-    | ----------------------------------------------- | ------------------------------------------------------------ |
-    | _extract_rpn_feature_maps                       | *rpn_features_to_crop*<br />*rpn_box_predictor_features*<br />*anchors* |
-    | _predict_first_stage                            | from _extract_rpn_feature_maps：<br />- rpn_box_predictor_features<br />- rpn_features_to_crop<br />- anchors_boxlist<br />**\_predict_rpn_proposals(rpn_box_predictor_features)**<br />**box_list_ops.clip_to_window(anchors_boxlist)<br />\_remove_invalid_anchors_and_predictions(rpn_box_encodings, rpn_objectness_predictions_with_background)** |
-    | _predict_rpn_proposals                          | Input: rpn_box_predictor_features<br />- **self.\_first_stage_box_predictor(rpn_box_predictor_features)**<br />- **self.\_first_stage_box_predictor.predict(rpn_box_predictor_features)**<br />Return: box_predictions (contain 2 lists)<br />*box_encodings*<br />*objectness_predictions_with_background* |
-    | \_first_stage_box_predictor<br /> (keras model) | box_predictor_builder.build_convolutional_box_predictor(<list>)<br />??? since the output list is corresponding to each input features. is the k_0 needs to be varied for different input feature???<br />Possible place of combine all |
-    | \_first_stage_box_predictor.predict             | box_predictor.predict(<list>)                                |
-    | predict                                         | **self._predict_second_stage()**<br />**self._predict_third_stage()**<br />*prediction_dict* |
-    | postprocess                                     | use prediction dict<br />**\_add_detection_features_output_node()**<br />**\_postprocess_rpn()** |
-    | \_postprocess_rpn                               | **\_batch_decode_boxes**                                     |
-    | loss                                            | use prediction dict                                          |
-    | \_loss_rpn                                      |                                                              |
-    | _predict_second_stage                           | use \_box_prediction (returns prediction dict)               |
-    | \_predict_third_stage                           | in none training mode use prediction_dict['rpn_features_to_crop'] |
-    | \_box_prediction                                | use \_compute_second_stage_input_feature_maps at the beginning |
-    | \_add_detection_features_output_node            | use \_compute_second_stage_input_feature_maps at the beginning |
-    |                                                 |                                                              |
+    | function                                          | things need to be change (Notation: *returned*, **function**) |
+    | ------------------------------------------------- | ------------------------------------------------------------ |
+    | _extract_rpn_feature_maps ✅                       | *rpn_features_to_crop*<br />*rpn_box_predictor_features*<br />*anchors* |
+    | _predict_first_stage ✅                            | from _extract_rpn_feature_maps：<br />- rpn_box_predictor_features<br />- rpn_features_to_crop<br />- anchors_boxlist<br />**\_predict_rpn_proposals(rpn_box_predictor_features)**<br />**box_list_ops.clip_to_window(anchors_boxlist)<br />\_remove_invalid_anchors_and_predictions(rpn_box_encodings, rpn_objectness_predictions_with_background)** |
+    | _predict_rpn_proposals ✅                          | Input: rpn_box_predictor_features<br />- **self.\_first_stage_box_predictor(rpn_box_predictor_features)**<br />- **self.\_first_stage_box_predictor.predict(rpn_box_predictor_features)**<br />Return: box_predictions (contain 2 lists)<br />*box_encodings*<br />*objectness_predictions_with_background* |
+    | \_first_stage_box_predictor<br /> (keras model) ✅ | box_predictor_builder.build_convolutional_box_predictor(<list>)<br />??? since the output list is corresponding to each input features. is the k_0 needs to be varied for different input feature???<br />Possible place of combine all |
+    | \_first_stage_box_predictor.predict ✅             | box_predictor.predict(<list>)                                |
+    | predict ✅                                         | **self._predict_second_stage()**<br />**self._predict_third_stage()**<br />*prediction_dict* |
+    | postprocess ✅                                     | use prediction dict<br />**\_add_detection_features_output_node()**<br />**\_postprocess_rpn()** |
+    | \_postprocess_rpn ✅                               | **\_batch_decode_boxes**                                     |
+    | loss ✅                                            | use prediction dict                                          |
+    | \_loss_rpn ✅                                      |                                                              |
+    | _predict_second_stage ✅                           | use \_box_prediction (returns prediction dict)               |
+    | \_predict_third_stage ✅                           | in none training mode use prediction_dict['rpn_features_to_crop'] |
+    | \_box_prediction ✅                                | use \_compute_second_stage_input_feature_maps at the beginning |
+    | \_add_detection_features_output_node ✅            | use \_compute_second_stage_input_feature_maps at the beginning |
+    |                                                   |                                                              |
 
     it should end at the _compute_second_stage_input_feature_maps
 
