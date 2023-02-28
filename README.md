@@ -1,4 +1,4 @@
-# tf-models
+# GSOC 2020 Project
 
 ## Mentor
 
